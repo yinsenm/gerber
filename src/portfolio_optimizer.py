@@ -1,3 +1,11 @@
+"""
+Name : portfolio_optimizer.py
+Author : Yinsen Miao
+ Contact : yinsenm@gmail.com
+Time    : 7/21/2021
+Desc: Solve mean-variance optimization
+"""
+
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
@@ -13,7 +21,6 @@ def set_eps_wgt_to_zeros(in_array, eps=1e-4):
     return out_array
 
 
-# http://www.turingfinance.com/computational-investing-with-python-week-one/
 class portfolio_optimizer:
     def __init__(self, min_weight: float = 0., max_weight: float = 1.0,
                  cov_function: str = "HC",
@@ -165,7 +172,8 @@ class portfolio_optimizer:
 
     def calc_annualized_portfolio_return(self, weights: np.array) -> float:
         # calculate the annualized standard returns
-        annualized_portfolio_return = float(np.sum(((1 + self.returns_df.mean()) ** self.factor - 1) * weights))
+        annualized_portfolio_return = float(np.sum(self.returns_df.mean() * self.factor * weights))
+        #float(np.sum(((1 + self.returns_df.mean()) ** self.factor - 1) * weights))
         return annualized_portfolio_return
 
     def calc_annualized_portfolio_std(self, weights: np.array) -> float:
@@ -222,9 +230,8 @@ class portfolio_optimizer:
 if __name__ == "__main__":
     bgn_date = "2016-01-01"
     end_date = "2020-01-01"
-    file_path = "../data/bloomberg/rets_v2.csv"
-    rets_df = pd.read_csv(file_path, parse_dates=['Date']). \
-                  query("Date >= '%s' and Date <= '%s'" % (bgn_date, end_date)).set_index(["Date"])
+    file_path = "../data/prcs.csv"
+    rets_df = pd.read_csv(file_path, parse_dates=['Date'], index_col=["Date"]).pct_change()[bgn_date: end_date]
     rets = rets_df.values
 
     # test objective function list

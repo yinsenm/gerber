@@ -1,3 +1,11 @@
+"""
+Name     : run_mvo.py
+Author   : Yinsen Miao
+ Contact : yinsenm@gmail.com
+Time     : 7/1/2021
+Desc     : run mean-variance optimization
+"""
+
 from util import get_mean_variance_space, plot_efficient_frontiers, get_frontier_limits
 import pandas as pd
 import numpy as np
@@ -9,14 +17,12 @@ DEBUG = 0
 
 # define global variables
 target_volatilities_array = np.arange(2, 16) / 100.  # target volatility level from 2% to 16%
-obj_function_list = ['equalWeighting', 'minVariance', 'maxReturn',  # optimization target
-                     'maxSharpe', 'maxSortino', 'riskParity']
-cov_function_list = ["HC", "SM", "GS1", "GS2"]  # list of covariance function
+obj_function_list = ['minVariance', 'maxSharpe']
+cov_function_list = ["HC", "SM", "GS1"]  # list of covariance function
 
 # portfolio setting
 cash_start = 100000.
 risk_free_rate = 0.
-transaction_per_share = 0.003
 gs_threshold = 0.9  # threshold for gerber statistics
 lookback_win_in_year = 2
 lookback_win_size = 12 * lookback_win_in_year
@@ -31,11 +37,11 @@ if __name__ == "__main__":
     gs_threshold = args.gs_threshold  # threshold for gerber statistics
     optimization_cost = args.optimization_cost  # penalty for excessive transaction
     transaction_cost = args.transaction_cost  # actual transaction fee in trading simulation
-    savepath = "./results/BLOOMBERG/%dyr_c%02dbps_t%02dbps/gs_threshold%.2f" % \
+    savepath = "../results/%dyr_c%02dbps_t%02dbps/gs_threshold%.2f" % \
         (lookback_win_in_year, optimization_cost, transaction_cost, gs_threshold)
 
 
-    prcs = pd.read_csv("../data/bloomberg/prcs_v3.csv", parse_dates=['Date']).\
+    prcs = pd.read_csv("../data/prcs.csv", parse_dates=['Date']).\
         set_index(['Date'])
     rets = prcs.pct_change().dropna(axis=0)
     prcs = prcs.iloc[1:]  # drop first row
@@ -138,13 +144,7 @@ if __name__ == "__main__":
                 port_t["portReturn"] = (port_t["weights"] * rets_tp1).sum()
                 port_t['values'] = port_t['weights'] * port_tm1['portValue']
 
-                # 1st pay transaction cost by number of shares
-                # calculate transaction cost to rebalance the portfolio
-                # pos_buy = np.maximum(port_t["shares"] - port_tm1["shares"], 0)
-                # pos_sell = np.maximum(port_tm1["shares"] - port_t["shares"], 0)
-                # port_t["transCost"] = (pos_buy + pos_sell).sum() * transaction_per_share
-
-                # 2nd to compute transaction by trading volume
+                # compute transaction by trading volume
                 # redistribute money according to the new weight
                 volume_buy  = np.maximum(port_t["values"] - port_tm1["values"], 0)
                 volume_sell = np.maximum(port_tm1["values"] - port_t["values"], 0)

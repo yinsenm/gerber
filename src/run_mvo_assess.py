@@ -1,4 +1,12 @@
-from portfolio_analysze import evaluate_port_performance
+"""
+Name     : run_mvo_assess.py
+Author   : Yinsen Miao
+Contact  : yinsenm@gmail.com
+Time     : 7/1/2021
+Desc     : assessment of MVO performance
+"""
+
+from portfolio_analyzer import evaluate_port_performance
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -10,18 +18,15 @@ sns.set_context("talk", font_scale=0.8)
 color_maps = {
     "HC":  "tab:blue",
     "SM":  "tab:brown",
-    "GS1": "tab:red",
-    "GS2": "tab:green",
+    "GS": "tab:red",
 }
 
 markers_maps = {
-    "HC":  "o",
-    "SM":  "p",
-    "GS1": "s",
-    "GS2": "D"
+    "HC": "o",
+    "SM": "p",
+    "GS": "s",
 }
 
-prefix = "results/bloomberg_1990_2020/bloomberg_2yr_ts_0.70"
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Assess Bloomberg Performance")
@@ -33,15 +38,13 @@ if __name__ == "__main__":
     ports_dict = {
         "HC":  "%s/HC_value.csv" % prefix,
         "SM": "%s/SM_value.csv" % prefix,
-        "GS1": "%s/GS1_value.csv" % prefix,
-        "GS2": "%s/GS2_value.csv" % prefix,
+        "GS": "%s/GS1_value.csv" % prefix,
     }
 
     turnovers_dict = {
         "HC":  "%s/HC_turnover.csv" % prefix,
         "SM": "%s/SM_turnover.csv" % prefix,
-        "GS1": "%s/GS1_turnover.csv" % prefix,
-        "GS2": "%s/GS2_turnover.csv" % prefix,
+        "GS": "%s/GS1_turnover.csv" % prefix,
     }
 
     port_names_dict = {
@@ -117,7 +120,7 @@ if __name__ == "__main__":
             map(lambda x: (x, key), df_value_perform.columns)
         )
         df_values_list.append(df_value_perform)
-    df_values = pd.concat(df_values_list, axis=1)[selected_columns].loc["2020-12-31"].to_frame().reset_index()
+    df_values = pd.concat(df_values_list, axis=1)[selected_columns].iloc[-1].to_frame().reset_index()
     df_values.columns = ["Portfolio", "Method", "Value"]
     df_values.Portfolio = [port_names_dict[port] for port in df_values.Portfolio] # map to labels
     df_values = df_values.pivot(index="Portfolio", columns="Method").round(2)

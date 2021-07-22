@@ -1,3 +1,11 @@
+"""
+Name   : portfolio_analyzer.py
+Author : Yinsen Miao
+Contact: yinsenm@gmail.com
+Time   : 7/1/2021
+Desc   : assess the portfolio performance
+"""
+
 import pandas as pd
 import numpy as np
 from pyfinance import TSeries, TFrame
@@ -5,6 +13,7 @@ from pyfinance.datasets import load_rf, load_shiller
 from scipy.stats import norm
 from get_data import get_stock_data
 from datetime import date
+from scipy import stats
 
 """
 Reference:
@@ -73,7 +82,7 @@ def evaluate_port_performance(filename: str = "./results/bloomberg_2yr/GS1_value
         # https://quant.stackexchange.com/questions/3667/skewness-and-kurtosis-under-aggregation
 
         annualized_skewness = (12 * lrets[port_name]).skew()
-        annualized_kurtosis = (12 * lrets[port_name]).kurtosis()
+        annualized_kurtosis = stats.kurtosis((12 * lrets[port_name]).to_list(), fisher=False) #(12 * lrets[port_name]).kurtosis()
 
         cumulative_ret = ts.cuml_ret()   # cumulative return
         annual_rets = ts.rollup('A')     # return by years
@@ -136,6 +145,7 @@ def evaluate_port_performance(filename: str = "./results/bloomberg_2yr/GS1_value
 
 
 if __name__ == "__main__":
-    filename = "./results/djia_3yr/HC_value.csv"
+    # filename = "./results/djia_3yr/HC_value.csv"
+    filename = "./data/bloomberg/prcs_v3.csv"
     df_port_performances = evaluate_port_performance(filename=filename)
     print(df_port_performances)

@@ -1,3 +1,11 @@
+"""
+Name     : util.py
+Author   : Yinsen Miao
+Contact  : yinsenm@gmail.com
+Time     : 7/1/2021
+Desc     : utility functions
+"""
+
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
